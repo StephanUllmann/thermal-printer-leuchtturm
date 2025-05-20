@@ -1,5 +1,7 @@
 // import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
+// import { drizzle } from 'drizzle-orm/libsql';
+import { drizzle } from 'drizzle-orm/node-postgres';
+const db = drizzle(process.env.PG_URL);
 
 // const client = createClient({
 //   url: 'file:db-file.db',
@@ -34,12 +36,12 @@ import { drizzle } from 'drizzle-orm/libsql';
 //   return db;
 // }
 
-const db = drizzle({
-  connection: {
-    url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.TURSO_AUTH_TOKEN,
-  },
-  // client,
-});
+// const db = drizzle({
+//   connection: {
+//     url: process.env.TURSO_DATABASE_URL,
+//     authToken: process.env.TURSO_AUTH_TOKEN,
+//   },
+//   // client,
+// });
 
 export { db };

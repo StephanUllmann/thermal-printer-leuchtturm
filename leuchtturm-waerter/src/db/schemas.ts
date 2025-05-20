@@ -1,21 +1,22 @@
-import { int, text, sqliteTable } from 'drizzle-orm/sqlite-core';
+// import { int, text, sqliteTable } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, text, varchar, integer } from 'drizzle-orm/pg-core';
 
-export const dishTable = sqliteTable('main_dishes', {
-  id: int().primaryKey({ autoIncrement: true }),
-  title: text().notNull(),
-  image: text().notNull(),
-  category: int().references(() => categoriesTable.id, { onDelete: 'no action' }),
+export const dishTable = pgTable('main_dishes', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar({ length: 510 }).notNull().unique(),
+  image: varchar({ length: 255 }).notNull(),
+  category: integer().references(() => categoriesTable.id, { onDelete: 'no action' }),
 });
 
-export const variantsTable = sqliteTable('variants', {
-  id: int().primaryKey({ autoIncrement: true }),
-  title: text().notNull(),
-  mainDishId: int().references(() => dishTable.id, { onDelete: 'no action' }),
+export const variantsTable = pgTable('variants', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar({ length: 510 }).notNull(),
+  mainDishId: integer().references(() => dishTable.id, { onDelete: 'no action' }),
 });
 
-export const categoriesTable = sqliteTable('categories', {
-  id: int().primaryKey({ autoIncrement: true }),
-  name: text().notNull(),
+export const categoriesTable = pgTable('categories', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar({ length: 510 }).notNull().unique(),
 });
 
 export type InsertDish = typeof dishTable.$inferInsert;
