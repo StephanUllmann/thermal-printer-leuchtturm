@@ -1,0 +1,25 @@
+{
+  "name": "thermal-printer",
+  "version": "1.0.0",
+  "scripts": {
+    "install:frontend": "cd leuchtturm-kellner && npm install",
+    "install:backend": "cd leuchtturm-waerter && npm install",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "build:frontend": "cd leuchtturm-kellner && npm run build",
+    "build:backend": "cd leuchtturm-waerter && npm run build",
+    "build:all": "npm run build:frontend && npm run build:backend",
+    "start:frontend": "cd leuchtturm-kellner && npm run start",
+    "start:backend": "cd leuchtturm-waerter && npm run start",
+    "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "dev:frontend": "cd leuchtturm-kellner && npm run dev",
+    "dev:backend": "cd leuchtturm-waerter && npm run dev",
+    "dev:all": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
