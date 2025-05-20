@@ -13,13 +13,15 @@
     "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "dev:frontend": "cd leuchtturm-kellner && npm run dev",
     "dev:backend": "cd leuchtturm-waerter && npm run dev",
-    "dev:all": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+    "dev:all": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "serve": "serve ./leuchtturm-kellner/dist  -s -l 8080 --no-clipboard"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "serve": "^14.2.4"
   }
 }
