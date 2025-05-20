@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import type { InsertCategory, InsertDish } from '../types/index';
+import type { InsertCategory } from '../types/index';
 
 import { toast } from 'react-toastify';
 import AddCategory from './AddCategory';
@@ -105,7 +105,11 @@ const AddDishForm = ({ setTrigger }: { setTrigger: React.Dispatch<React.SetState
           className='hidden'
           name='image'
           id='image'
-          onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))}
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0) {
+              setFile(URL.createObjectURL(e.target.files[0]));
+            }
+          }}
         />
 
         <button className='btn'>

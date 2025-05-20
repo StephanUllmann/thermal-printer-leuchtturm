@@ -3,7 +3,7 @@ import type { Dish } from '../types';
 
 const EditDishForm = ({ dish }: { dish: Dish }) => {
   const [file, setFile] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   return (
     <form onSubmit={() => {}} inert={loading}>
@@ -56,7 +56,11 @@ const EditDishForm = ({ dish }: { dish: Dish }) => {
           className='hidden'
           name='image'
           id='image'
-          onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))}
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0) {
+              setFile(URL.createObjectURL(e.target.files[0]));
+            }
+          }}
         />
 
         <button className='btn'>

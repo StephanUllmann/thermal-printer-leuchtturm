@@ -1,12 +1,12 @@
 module.exports = {
   apps: [
-    {
-      name: 'leuchtturm-kellner-build',
-      cwd: './leuchtturm-kellner',
-      script: 'npm',
-      args: 'run build',
-      autorestart: false,
-    },
+    // {
+    //   name: 'leuchtturm-kellner-build',
+    //   cwd: './leuchtturm-kellner',
+    //   script: 'npm',
+    //   args: 'run build',
+    //   autorestart: false,
+    // },
     {
       name: 'leuchtturm-kellner-serve',
       cwd: './leuchtturm-kellner/dist',
