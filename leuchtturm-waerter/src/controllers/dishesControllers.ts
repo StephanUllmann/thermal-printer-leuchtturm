@@ -43,6 +43,9 @@ const getAllDishes = async (req: Request, res: Response) => {
     })
     .from(dishTable)
     .leftJoin(categoriesTable, eq(dishTable.category, categoriesTable.id));
+  // console.log('--------------<>----------------');
+  // console.log(result);
+  // console.log('<--------------<>---------------->');
   res.json({ msg: 'Dishes', result });
 };
 

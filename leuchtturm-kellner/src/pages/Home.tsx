@@ -26,14 +26,14 @@ const Home = () => {
     [mainDishes]
   );
 
-  console.log(selection);
+  // console.log(selection);
 
   const ordered =
     mainDishes &&
     Object.entries(Object.groupBy(mainDishes, ({ categories }) => categories.name)).sort((a, b) =>
       a[0].localeCompare(b[0])
     );
-  // console.dir(ordered);
+  // console.dir(mainDishes);
   return (
     <div className=''>
       {ordered?.map(([category, dishes]) => (

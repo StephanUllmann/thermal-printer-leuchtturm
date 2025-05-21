@@ -7,14 +7,17 @@ import type { Dish, OutletContext, InsertCategory } from '../types';
 const MainLayout = () => {
   const [mainDishes, setMainDishes] = useState<null | Dish[]>(null);
   const [categories, setCategories] = useState<null | InsertCategory[]>(null);
-
+  console.log('MAINLAYOUT DISHES: ', mainDishes);
   const [trigger, setTrigger] = useState(false);
   const [refetchCategories, setRefetchCategories] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:3000/dishes`)
       .then((res) => res.json())
-      .then((data) => setMainDishes(data.result))
+      .then((data) => {
+        console.log('DATA HERE: ', data);
+        setMainDishes(data.result);
+      })
       .catch((err) => console.log(err));
   }, [trigger]);
 
