@@ -6,12 +6,11 @@ import EditDishForm from '../components/EditDishForm';
 
 const AddDish = () => {
   const [dishSelected, setDishSelected] = useState<null | Dish>(null);
-  const [trigger, setTrigger] = useState(false);
 
   return (
     <>
-      {dishSelected ? <EditDishForm dish={dishSelected} /> : <AddDishForm setTrigger={setTrigger} />}
-      <AddVariants trigger={trigger} setDishSelected={setDishSelected} selected={dishSelected?.main_dishes.id} />
+      {dishSelected ? <EditDishForm key={dishSelected.main_dishes.id} dish={dishSelected} /> : <AddDishForm />}
+      <AddVariants setDishSelected={setDishSelected} selected={dishSelected?.main_dishes.id} />
     </>
   );
 };

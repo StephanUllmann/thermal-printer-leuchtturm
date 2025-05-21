@@ -1,8 +1,9 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import type { InsertCategory } from '../types/index';
+import { useState, type FormEvent } from 'react';
+import type { OutletContext } from '../types/index';
 
 import { toast } from 'react-toastify';
 import AddCategory from './AddCategory';
+import { useOutletContext } from 'react-router-dom';
 
 interface DishFormElements extends HTMLFormControlsCollection {
   title: HTMLInputElement;
@@ -10,18 +11,12 @@ interface DishFormElements extends HTMLFormControlsCollection {
   category: HTMLInputElement;
 }
 
-const AddDishForm = ({ setTrigger }: { setTrigger: React.Dispatch<React.SetStateAction<boolean>> }) => {
-  const [triggerRefetch, setTriggerRefetch] = useState(false);
+const AddDishForm = () => {
+  const { setTrigger, categories } = useOutletContext<OutletContext>();
+
+  // const [triggerRefetch, setTriggerRefetch] = useState(false);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState('');
-  const [categories, setCategories] = useState<null | InsertCategory[]>(null);
-
-  useEffect(() => {
-    fetch(`http://localhost:3000/dishes/categories`)
-      .then((res) => res.json())
-      .then((data) => setCategories(data.result))
-      .catch((err) => console.log(err));
-  }, [triggerRefetch]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -56,7 +51,6 @@ const AddDishForm = ({ setTrigger }: { setTrigger: React.Dispatch<React.SetState
       });
 
       if (!res.ok) throw new Error('Error posting new dish', { cause: res });
-      // const data = await res.json();
       toast.success('Neues Gericht hinzugefügt');
       (e.target as HTMLFormElement).reset();
       setFile('');
@@ -91,7 +85,7 @@ const AddDishForm = ({ setTrigger }: { setTrigger: React.Dispatch<React.SetState
               </option>
             ))}
           </select>
-          <AddCategory setTriggerRefetch={setTriggerRefetch} />
+          <AddCategory />
         </div>
 
         <label className='label flex flex-col items-start' htmlFor='image'>

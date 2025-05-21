@@ -6,6 +6,7 @@ import {
   deleteVariant,
   getCategories,
   createCategory,
+  updateDish,
 } from '../controllers/dishesControllers.js';
 import upload from '../middlewares/upload.js';
 
@@ -14,6 +15,7 @@ const dishesRouter = express.Router();
 dishesRouter.get('/', getAllDishes);
 
 dishesRouter.post('/', upload.single('image'), createDish);
+dishesRouter.put('/:dishId', upload.single('image'), updateDish);
 
 dishesRouter.post('/:dishId/variants', createVariant);
 

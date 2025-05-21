@@ -1,23 +1,17 @@
-import { useEffect, useState } from 'react';
-import type { Dish } from '../types';
+import { useEffect } from 'react';
+import type { Dish, OutletContext } from '../types';
+import { useOutletContext } from 'react-router-dom';
 
 const AddVariants = ({
   setDishSelected,
-  trigger,
+
   selected,
 }: {
   setDishSelected: React.Dispatch<React.SetStateAction<Dish | null>>;
-  trigger: boolean;
+
   selected: number | undefined;
 }) => {
-  const [mainDishes, setMainDishes] = useState<null | Dish[]>(null);
-
-  useEffect(() => {
-    fetch(`http://localhost:3000/dishes`)
-      .then((res) => res.json())
-      .then((data) => setMainDishes(data.result))
-      .catch((err) => console.log(err));
-  }, [trigger]);
+  const { mainDishes } = useOutletContext<OutletContext>();
 
   useEffect(() => {
     const clickOutside = (e: MouseEvent) => {
@@ -30,12 +24,12 @@ const AddVariants = ({
   }, [setDishSelected]);
 
   return (
-    <div className='py-4 px-3 flex gap-2 overflow-x-scroll my-5 max-w-xl scroll-smooth  snap-x snap-mandatory snap-always snap-end'>
+    <div className='py-4 px-3 flex flex-wrap justify-center gap-4 overflow-y-auto my-5 max-w-xl max-h-96 scroll-smooth  snap-y snap-mandatory snap-always snap-end'>
       {mainDishes?.map((d) => (
         <button
           data-dish
           onClick={() => setDishSelected(d)}
-          className={`border w-36 h-36 grid overflow-clip rounded shrink-0 ${
+          className={`border size-36 grid overflow-clip rounded shrink-0 ${
             selected === d.main_dishes.id ? 'ring-3 ring-offset-3 ring-primary' : ''
           }`}
           key={'dish-' + d.main_dishes.id}

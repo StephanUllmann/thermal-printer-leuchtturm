@@ -1,13 +1,17 @@
 import { useRef, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
+import { useOutletContext } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import type { OutletContext } from '../types';
 
 interface CategoryFormElements extends HTMLFormControlsCollection {
   'new-category': HTMLInputElement;
 }
 
-const AddCategory = ({ setTriggerRefetch }: { setTriggerRefetch: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const AddCategory = () => {
   const dialogRef = useRef<null | HTMLDialogElement>(null);
+
+  const { setRefetchCategories } = useOutletContext<OutletContext>();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,8 +30,8 @@ const AddCategory = ({ setTriggerRefetch }: { setTriggerRefetch: React.Dispatch<
       if (!res.ok) throw new Error('Error creating new category', { cause: res });
       const data = await res.json();
       console.log(data);
-      setTriggerRefetch((p) => !p);
-      toast.success('Neues Gericht hinzugefügt');
+      setRefetchCategories((p) => !p);
+      toast.success('Neue Kategorie hinzugefügt');
       (e.target as HTMLFormElement).reset();
       dialogRef.current?.close();
     } catch (error) {
