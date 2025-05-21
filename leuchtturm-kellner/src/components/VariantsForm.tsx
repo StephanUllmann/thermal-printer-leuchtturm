@@ -49,7 +49,7 @@ const VariantsForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
     }
   };
 
-  console.log('VARIANTS: ', dish?.variants);
+  // console.log('VARIANTS: ', dish?.variants);
   return (
     <div
       data-dish
@@ -57,15 +57,17 @@ const VariantsForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
     '
     >
       <h2>Varianten</h2>
-      {dish?.variants?.map((v) => (
-        <div className='w-xs  join'>
-          <span className='input join-item'>{v.title}</span>
+      {dish &&
+        Array.isArray(dish.variants) &&
+        dish.variants.map((v) => (
+          <div className='w-xs  join'>
+            <span className='input join-item'>{v.title}</span>
 
-          <button onClick={() => handleDelete(v.id!)} type='button' className='btn join-item w-12'>
-            -
-          </button>
-        </div>
-      ))}
+            <button onClick={() => handleDelete(v.id!)} type='button' className='btn join-item w-12'>
+              -
+            </button>
+          </div>
+        ))}
       <form className='w-xs join' onSubmit={handleSubmit}>
         <input type='text' className='input join-item' name='newVariant' />
         <button className='btn join-item w-12'>+</button>
