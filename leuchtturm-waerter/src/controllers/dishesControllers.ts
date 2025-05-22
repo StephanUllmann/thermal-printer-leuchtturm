@@ -46,15 +46,15 @@ const getAllDishes = async (req: Request, res: Response) => {
   // console.log('--------------<>----------------');
   // console.log(result);
   // console.log('<--------------<>---------------->');
-  res.json({ msg: 'Dishes', result });
+  res.json(result);
 };
 
 const createDish = async (req: Request & { file: any }, res: Response) => {
   const title = req.body.title;
   const category = req.body.category;
   const image = req.file.public_id;
-  const result = await db.insert(dishTable).values({ title, image, category });
-  res.json({ msg: 'Dish added', result, image: req.file.secure_url });
+  await db.insert(dishTable).values({ title, image, category });
+  await getAllDishes(req, res);
 };
 
 const updateDish = async (req, res) => {
@@ -63,33 +63,35 @@ const updateDish = async (req, res) => {
   const category = req.body.category;
   const image = req.file?.public_id;
 
-  const result = await db.update(dishTable).set({ title, image, category }).where(eq(dishTable.id, dishId));
-  res.json({ msg: 'Dish updated', result, image: req.file });
+  await db.update(dishTable).set({ title, image, category }).where(eq(dishTable.id, dishId));
+  // res.json({ msg: 'Dish updated', result, image: req.file });
+  await getAllDishes(req, res);
 };
 
 const createVariant = async (req, res) => {
   const { dishId } = req.params;
   const { title } = req.body;
-  const result = await db.insert(variantsTable).values({ title, mainDishId: dishId });
-  res.json({ msg: 'Variant added', result });
+  await db.insert(variantsTable).values({ title, mainDishId: dishId });
+  await getAllDishes(req, res);
 };
 
 const deleteVariant = async (req, res) => {
   const { variantsId } = req.params;
   await db.delete(variantsTable).where(eq(variantsTable.id, variantsId));
-  res.json({ msg: 'Variant deleted' });
+  // res.json({ msg: 'Variant deleted' });
+  await getAllDishes(req, res);
 };
 
 const getCategories = async (req, res) => {
   const result = await db.select().from(categoriesTable);
-  res.json({ msg: 'Categories', result });
+  res.json(result);
 };
 
 const createCategory = async (req, res) => {
   const { name } = req.body;
-  const result = await db.insert(categoriesTable).values({ name });
-  console.log(result);
-  res.json({ msg: 'Category added', name });
+  await db.insert(categoriesTable).values({ name });
+  // console.log(result);
+  await getCategories(req, res);
 };
 
 export { getAllDishes, createDish, createVariant, deleteVariant, getCategories, createCategory, updateDish };

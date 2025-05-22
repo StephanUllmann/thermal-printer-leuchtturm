@@ -3,4 +3,5 @@
 
 :root {
   scrollbar-gutter: stable;
+  interpolate-size: allow-keywords;
 }

@@ -1,4 +1,4 @@
-import { cutPaper, printData } from '../lib/printer.js';
+import { cutPaper, printData, printTable } from '../lib/printer.js';
 
 const simplePrint = async (req, res) => {
   const { text } = req.body;
@@ -7,4 +7,10 @@ const simplePrint = async (req, res) => {
   res.json({ msg: `Printed:\n${text}` });
 };
 
-export { simplePrint };
+const printOrder = async (req, res) => {
+  await printTable(req.body);
+  await cutPaper();
+  res.json({ msg: `Printed` });
+};
+
+export { simplePrint, printOrder };

@@ -132,6 +132,34 @@ export const printData = (data: string) => {
     resolve('Done');
   });
 };
+export const printTable = (data: any) => {
+  return new Promise((resolve, reject) => {
+    if (!isConnected || !client || client.destroyed) {
+      console.error('[🧾 THERMAL] Cannot print: Printer not connected.');
+      return reject(new Error('Printer not connected'));
+    }
+
+    const now = new Date();
+    const time = dateFormat.format(now);
+
+    let result = encoder
+      .initialize()
+      .text(time)
+      .newline()
+      .table(
+        [
+          { width: 36, marginRight: 2, align: 'left' },
+          { width: 10, align: 'right' },
+        ],
+        data
+      )
+      .newline()
+      .newline()
+      .encode();
+    client.write(result);
+    resolve('Done');
+  });
+};
 
 export async function cutPaper() {
   let result = encoder.newline().newline().newline().newline().newline().cut('full').encode();

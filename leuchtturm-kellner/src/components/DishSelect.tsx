@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import type { Dish } from '../types';
 
 const DishSelect = ({
@@ -9,32 +10,105 @@ const DishSelect = ({
   selection: null | Record<string, number>;
   changeSelection: (name: string, operation: 'inc' | 'dec') => void;
 }) => {
-  const handleSelect = (operation: 'inc' | 'dec') => {
-    changeSelection(dish.main_dishes.title, operation);
+  const liRef = useRef<null | HTMLLIElement>(null);
+  const [showVariants, setShowVariants] = useState(false);
+
+  const hasVariants = (dish.variants && dish.variants?.length > 0) ?? false;
+
+  const handleSelect = (title: string, operation: 'inc' | 'dec') => {
+    changeSelection(title, operation);
   };
 
+  const totalStandard = selection
+    ? Object.entries(selection)
+        .filter((entry) => {
+          return entry[0].startsWith(dish.main_dishes.title);
+        })
+        .reduce((acc, val) => (acc += val[1]), 0)
+    : 0;
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (liRef.current && !liRef.current.contains(e.target as HTMLElement)) {
+        setShowVariants(false);
+      }
+    };
+
+    document.addEventListener('click', handleClick, true);
+
+    return () => document.removeEventListener('click', handleClick, true);
+  }, []);
+
   return (
-    <li className='list-row'>
-      <div>
-        <img
-          className='size-10 rounded-box'
-          src={
-            `https://res.cloudinary.com/dvniua4ab/image/upload/c_thumb,g_center,h_150,w_150/f_webp/q_auto:eco/` +
-            dish.main_dishes.image
-          }
-          alt=''
-        />
+    <li ref={liRef} onClick={() => hasVariants && setShowVariants(true)}>
+      <div className='list-row'>
+        <div>
+          <img
+            className='size-10 rounded-box'
+            src={
+              `https://res.cloudinary.com/dvniua4ab/image/upload/c_thumb,g_center,h_150,w_150/f_webp/q_auto:eco/` +
+              dish.main_dishes.image
+            }
+            alt=''
+          />
+        </div>
+        <div className='content-center'>
+          <div className='text-sm capitalize font-semibold opacity-60'>{dish.main_dishes.title}</div>
+        </div>
+        <button
+          onClick={() => (hasVariants ? setShowVariants(true) : handleSelect(dish.main_dishes.title, 'dec'))}
+          className='btn btn-square '
+        >
+          &minus;
+        </button>
+
+        <span className='content-center'>{totalStandard}</span>
+        <button
+          onClick={() => (hasVariants ? setShowVariants(true) : handleSelect(dish.main_dishes.title, 'inc'))}
+          className='btn btn-square '
+        >
+          &#x2B;
+        </button>
       </div>
-      <div className='content-center'>
-        <div className='text-sm capitalize font-semibold opacity-60'>{dish.main_dishes.title}</div>
-      </div>
-      <button onClick={() => handleSelect('dec')} className='btn btn-square '>
-        &minus;
-      </button>
-      <span className='content-center'>{selection?.[dish.main_dishes.title] ?? 0}</span>
-      <button onClick={() => handleSelect('inc')} className='btn btn-square '>
-        &#x2B;
-      </button>
+      {hasVariants && (
+        <ul
+          className={`mb-5 overflow-clip transition-[height] transition-discrete k ${showVariants ? 'h-auto' : 'h-0'}`}
+        >
+          <li className='list-row justify-between flex'>
+            <div className='content-center'>
+              <div className='ml-5 text-xs capitalize font-semibold opacity-60'>Standard</div>
+            </div>
+            <div>
+              <button onClick={() => handleSelect(dish.main_dishes.title, 'dec')} className='btn btn-square'>
+                &minus;
+              </button>
+              <span className='content-center mx-2'>{selection?.[dish.main_dishes.title] ?? 0}</span>
+              <button onClick={() => handleSelect(dish.main_dishes.title, 'inc')} className='btn btn-square'>
+                &#x2B;
+              </button>
+            </div>
+          </li>
+          {dish.variants!.map((v) => {
+            const key = `${dish.main_dishes.title} -- ${v.title}`;
+            return (
+              <li key={key} className='list-row justify-between flex'>
+                <div className='content-center'>
+                  <div className='ml-5 text-xs capitalize font-semibold opacity-60'>{v.title}</div>
+                </div>
+                <div>
+                  <button onClick={() => handleSelect(key, 'dec')} className='btn btn-square'>
+                    &minus;
+                  </button>
+                  <span className='content-center mx-2'>{selection?.[key] ?? 0}</span>
+                  <button onClick={() => handleSelect(key, 'inc')} className='btn btn-square'>
+                    &#x2B;
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </li>
   );
 };
