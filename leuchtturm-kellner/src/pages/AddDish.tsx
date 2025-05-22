@@ -9,7 +9,11 @@ const AddDish = () => {
 
   return (
     <>
-      {dishSelected ? <EditDishForm key={dishSelected.main_dishes.id} dish={dishSelected} /> : <AddDishForm />}
+      {dishSelected ? (
+        <EditDishForm key={dishSelected.main_dishes.id} dishId={dishSelected.main_dishes.id} />
+      ) : (
+        <AddDishForm />
+      )}
       <AddVariants setDishSelected={setDishSelected} selected={dishSelected?.main_dishes.id} />
     </>
   );

@@ -1,10 +1,11 @@
-import { useOutletContext } from 'react-router-dom';
-import type { OutletContext, Dish } from '../types';
+import type { Dish } from '../types';
 import { useCallback, useState } from 'react';
 import Categories from '../components/Categories';
+import { fetcher } from '../utils';
+import useSWR from 'swr';
 
 const Home = () => {
-  const { mainDishes } = useOutletContext<OutletContext>();
+  const { data: mainDishes } = useSWR<Dish[]>('http://localhost:3000/dishes', fetcher);
   const [selection, setSelection] = useState<null | Record<string, number>>(null);
 
   const changeSelection = useCallback(

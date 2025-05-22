@@ -19,6 +19,11 @@ type Dish = {
   variants: InsertVariant[] | null;
 };
 
+type DishesResponse = {
+  msg: string;
+  result: Dish[];
+};
+
 type OutletContext = {
   trigger: boolean;
   setTrigger: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,4 +34,4 @@ type OutletContext = {
   setRefetchCategories: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export type { InsertDish, InsertVariant, InsertCategory, Dish, OutletContext };
+export type { InsertDish, InsertVariant, InsertCategory, Dish, OutletContext, DishesResponse };

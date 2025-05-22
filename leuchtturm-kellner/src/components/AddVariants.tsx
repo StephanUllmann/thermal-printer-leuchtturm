@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
-import type { Dish, OutletContext } from '../types';
-import { useOutletContext } from 'react-router-dom';
+import useSWR from 'swr';
+import { fetcher } from '../utils';
+import type { Dish } from '../types';
 
 const AddVariants = ({
   setDishSelected,
-
   selected,
 }: {
   setDishSelected: React.Dispatch<React.SetStateAction<Dish | null>>;
-
   selected: number | undefined;
 }) => {
-  const { mainDishes } = useOutletContext<OutletContext>();
+  const { data } = useSWR<Dish[]>('http://localhost:3000/dishes', fetcher);
 
   useEffect(() => {
     const clickOutside = (e: MouseEvent) => {
@@ -25,7 +24,7 @@ const AddVariants = ({
 
   return (
     <div className='py-4 px-3 flex flex-wrap justify-center gap-4 overflow-y-auto my-5 max-w-xl max-h-96 scroll-smooth  snap-y snap-mandatory snap-always snap-end'>
-      {mainDishes?.map((d) => (
+      {data?.map((d) => (
         <button
           data-dish
           onClick={() => setDishSelected(d)}

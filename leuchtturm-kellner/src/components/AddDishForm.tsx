@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import type { OutletContext } from '../types/index';
-
+import type { InsertCategory, Dish } from '../types/index';
+import useSWR from 'swr';
 import { toast } from 'react-toastify';
+import { fetcher, createDish } from '../utils';
 import AddCategory from './AddCategory';
-import { useOutletContext } from 'react-router-dom';
 
 interface DishFormElements extends HTMLFormControlsCollection {
   title: HTMLInputElement;
@@ -12,10 +12,9 @@ interface DishFormElements extends HTMLFormControlsCollection {
 }
 
 const AddDishForm = () => {
-  const { setTrigger, categories } = useOutletContext<OutletContext>();
-
-  // const [triggerRefetch, setTriggerRefetch] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { data: categories } = useSWR<InsertCategory[]>('http://localhost:3000/dishes/categories', fetcher);
+  const { data: dishes, mutate, isValidating } = useSWR<Dish[]>('http://localhost:3000/dishes', fetcher);
+  // console.log({ error, isValidating });
   const [file, setFile] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
@@ -24,7 +23,7 @@ const AddDishForm = () => {
     if (!elements.title) return;
     const title = elements.title.value;
     const image = elements.image.files[0];
-    const category = elements.category.value;
+    const [categoryId, categoryName] = elements.category.value.split('_-');
 
     if (!title) {
       toast.error('Füge einen Namen für das Gericht hinzu.');
@@ -34,7 +33,7 @@ const AddDishForm = () => {
       toast.error('Füge eine Bild hinzu.');
       return;
     }
-    if (!category) {
+    if (!categoryId) {
       toast.error('Füge eine Kategorie hinzu.');
       return;
     }
@@ -42,29 +41,31 @@ const AddDishForm = () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('image', image);
-    formData.append('category', category);
-    try {
-      setLoading(true);
-      const res = await fetch('http://localhost:3000/dishes', {
-        method: 'POST',
-        body: formData,
-      });
+    formData.append('category', categoryId);
 
-      if (!res.ok) throw new Error('Error posting new dish', { cause: res });
+    try {
+      await mutate(createDish(formData), {
+        optimisticData: [
+          ...dishes!,
+          {
+            categories: { id: Number(categoryId), name: categoryName },
+            variants: [],
+            main_dishes: { title, image: 'leuchtturm/ijca2fqfx9jhtzkcydlr' },
+          },
+        ],
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: true,
+      });
       toast.success('Neues Gericht hinzugefügt');
-      (e.target as HTMLFormElement).reset();
-      setFile('');
-      setTrigger((p) => !p);
     } catch (error) {
       console.error(error);
       toast.error('Etwas ist schief gelaufen');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} inert={loading}>
+    <form onSubmit={handleSubmit} inert={isValidating}>
       <fieldset className='fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 mx-auto'>
         <legend className='fieldset-legend'>Neues Gericht hinzufügen</legend>
 
@@ -80,7 +81,7 @@ const AddDishForm = () => {
           <select defaultValue='Wähle eine Kategorie' className='select' name='category' id='category'>
             <option disabled={true}>Wähle eine Kategorie</option>
             {categories?.map((c) => (
-              <option value={c.id} key={c.name + c.id}>
+              <option value={c.id + '_-' + c.name} key={c.name + c.id}>
                 {c.name}
               </option>
             ))}
@@ -107,7 +108,7 @@ const AddDishForm = () => {
         />
 
         <button className='btn'>
-          {loading ? <span className='loading loading-infinity loading-sm'></span> : 'Eintragen'}
+          {isValidating ? <span className='loading loading-infinity loading-sm'></span> : 'Eintragen'}
         </button>
       </fieldset>
     </form>

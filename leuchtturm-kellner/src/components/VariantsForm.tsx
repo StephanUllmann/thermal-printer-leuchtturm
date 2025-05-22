@@ -1,16 +1,39 @@
 import type { FormEvent } from 'react';
-import type { Dish, OutletContext } from '../types';
+import type { Dish } from '../types';
 import { toast } from 'react-toastify';
-import { useOutletContext } from 'react-router-dom';
+import useSWR from 'swr';
+import { fetcher } from '../utils';
 
 interface VariantsElements extends HTMLFormControlsCollection {
   newVariant: HTMLInputElement;
 }
 
+const createVariant = async (dishId: number, title: string) => {
+  const res = await fetch(`http://localhost:3000/dishes/${dishId}/variants`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title }),
+  });
+  if (!res.ok) throw new Error('Error posting new variant', { cause: res });
+  const data = await res.json();
+  return data;
+};
+
+const deleteVariant = async (dishId: number, variantId: number) => {
+  const res = await fetch(`http://localhost:3000/dishes/${dishId}/variants/${variantId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Error deleting variant', { cause: res });
+  const data = await res.json();
+  return data;
+};
+
 const VariantsForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
-  const { setTrigger, mainDishes } = useOutletContext<OutletContext>();
-  console.log(dishId);
+  const { data: mainDishes, mutate, isValidating } = useSWR<Dish[]>('http://localhost:3000/dishes', fetcher);
   const dish = mainDishes?.find((d) => d.main_dishes.id === dishId);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const elements = (e.target as HTMLFormElement).elements as VariantsElements;
@@ -18,17 +41,21 @@ const VariantsForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
     const title = elements.newVariant.value;
     if (!title) return;
 
+    // const optimisticData = mainDishes?.map((d) => {
+    //   if (d.main_dishes.id !== dishId) return d;
+    //   return { ...d, [d.variants]: [...d.variants] };
+    // });
+
     try {
-      const res = await fetch(`http://localhost:3000/dishes/${dish.main_dishes.id}/variants`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title }),
+      await mutate(createVariant(dishId!, title), {
+        // optimisticData,
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: true,
       });
-      if (!res.ok) throw new Error('Error posting new variant', { cause: res });
+
       (e.target as HTMLFormElement).reset();
-      setTrigger((p) => !p);
+      // setTrigger((p) => !p);
     } catch (error) {
       console.error(error);
       toast.error('Etwas ist schief gelaufen');
@@ -38,11 +65,13 @@ const VariantsForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
   const handleDelete = async (variantId: number) => {
     if (!dish) return;
     try {
-      const res = await fetch(`http://localhost:3000/dishes/${dish.main_dishes.id}/variants/${variantId}`, {
-        method: 'DELETE',
+      await mutate(deleteVariant(dishId!, variantId), {
+        // optimisticData,
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: true,
       });
-      if (!res.ok) throw new Error('Error deleting variant', { cause: res });
-      setTrigger((p) => !p);
+      // setTrigger((p) => !p);
     } catch (error) {
       console.error(error);
       toast.error('Etwas ist schief gelaufen');
@@ -60,17 +89,24 @@ const VariantsForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
       {dish &&
         Array.isArray(dish.variants) &&
         dish.variants.map((v) => (
-          <div className='w-xs  join'>
+          <div key={v.title + dishId} className='w-xs  join'>
             <span className='input join-item'>{v.title}</span>
 
-            <button onClick={() => handleDelete(v.id!)} type='button' className='btn join-item w-12'>
+            <button
+              disabled={isValidating}
+              onClick={() => handleDelete(v.id!)}
+              type='button'
+              className='btn join-item w-12'
+            >
               -
             </button>
           </div>
         ))}
       <form className='w-xs join' onSubmit={handleSubmit}>
         <input type='text' className='input join-item' name='newVariant' />
-        <button className='btn join-item w-12'>+</button>
+        <button disabled={isValidating} className='btn join-item w-12'>
+          +
+        </button>
       </form>
     </div>
   );

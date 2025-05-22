@@ -1,8 +1,9 @@
 import { useRef, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { useOutletContext } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import type { OutletContext } from '../types';
+import type { InsertCategory } from '../types';
+import { fetcher, createCategory } from '../utils';
+import useSWR from 'swr';
 
 interface CategoryFormElements extends HTMLFormControlsCollection {
   'new-category': HTMLInputElement;
@@ -11,7 +12,11 @@ interface CategoryFormElements extends HTMLFormControlsCollection {
 const AddCategory = () => {
   const dialogRef = useRef<null | HTMLDialogElement>(null);
 
-  const { setRefetchCategories } = useOutletContext<OutletContext>();
+  const {
+    data: categories,
+    mutate,
+    isValidating,
+  } = useSWR<InsertCategory[]>('http://localhost:3000/dishes/categories', fetcher);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -20,17 +25,13 @@ const AddCategory = () => {
     if (!newCategory) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/dishes/categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: newCategory }),
+      await mutate(createCategory(newCategory), {
+        optimisticData: [...categories!, { name: newCategory }],
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: true,
       });
-      if (!res.ok) throw new Error('Error creating new category', { cause: res });
-      const data = await res.json();
-      console.log(data);
-      setRefetchCategories((p) => !p);
+
       toast.success('Neue Kategorie hinzugefügt');
       (e.target as HTMLFormElement).reset();
       dialogRef.current?.close();
@@ -47,7 +48,7 @@ const AddCategory = () => {
       </button>
       {createPortal(
         <dialog ref={dialogRef} className='modal'>
-          <form onSubmit={handleSubmit} className='modal-box flex flex-col'>
+          <form onSubmit={handleSubmit} className='modal-box flex flex-col' inert={isValidating}>
             <label className='label' htmlFor='new-category'>
               Neue Kategorie
             </label>
@@ -59,10 +60,17 @@ const AddCategory = () => {
               name='new-category'
             />
             <div className='modal-action'>
-              <button type='button' onClick={() => dialogRef.current?.close()} className='btn btn-warning'>
+              <button
+                disabled={isValidating}
+                type='button'
+                onClick={() => dialogRef.current?.close()}
+                className='btn btn-warning'
+              >
                 Schließen
               </button>
-              <button className='btn btn-primary'>Hinzufügen</button>
+              <button disabled={isValidating} className='btn btn-primary'>
+                Hinzufügen
+              </button>
             </div>
           </form>
         </dialog>,

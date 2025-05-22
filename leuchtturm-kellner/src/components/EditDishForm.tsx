@@ -1,17 +1,31 @@
 import { useState, type FormEvent } from 'react';
-import type { Dish, OutletContext } from '../types';
-import { useOutletContext } from 'react-router-dom';
-import AddCategory from './AddCategory';
+import useSWR from 'swr';
 import { toast } from 'react-toastify';
+import AddCategory from './AddCategory';
 import VariantsForm from './VariantsForm';
+import { fetcher } from '../utils';
+import type { Dish, InsertCategory } from '../types';
 
-const EditDishForm = ({ dish }: { dish: Dish }) => {
+const editDish = async (dishId: number, formData: FormData) => {
+  const res = await fetch(`http://localhost:3000/dishes/${dishId}`, {
+    method: 'PUT',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Error posting new dish', { cause: res });
+  const data = await res.json();
+  return data;
+};
+
+const EditDishForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
   const [fileURL, setFileURL] = useState('');
   const [file, setFile] = useState<null | File>(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(() => dish.categories);
-  const [title, setTitle] = useState(dish.main_dishes.title);
-  const { categories, setTrigger } = useOutletContext<OutletContext>();
+  const { data: categories } = useSWR<InsertCategory[]>('http://localhost:3000/dishes/categories', fetcher);
+
+  const { data: dishes, mutate, isValidating } = useSWR<Dish[]>('http://localhost:3000/dishes', fetcher);
+  const dish = dishes?.find((d) => d.main_dishes.id === dishId);
+  const [selectedCategory, setSelectedCategory] = useState(() => dish!.categories);
+  const [title, setTitle] = useState(dish!.main_dishes.title);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -21,28 +35,31 @@ const EditDishForm = ({ dish }: { dish: Dish }) => {
     formData.append('category', selectedCategory!.id!.toString());
     if (file) formData.append('image', file);
     try {
-      setLoading(true);
-      const res = await fetch(`http://localhost:3000/dishes/${dish.main_dishes.id}`, {
-        method: 'PUT',
-        body: formData,
+      const optimisticData = dishes?.map((d) => {
+        if (d.main_dishes.id !== dishId) return d;
+
+        return { ...d, [d.main_dishes.title]: title };
       });
 
-      if (!res.ok) throw new Error('Error posting new dish', { cause: res });
+      await mutate(editDish(dishId!, formData), {
+        optimisticData,
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: true,
+      });
+
       toast.success('Gespeichert');
       setFile(null);
       setFileURL('');
-      setTrigger((p) => !p);
     } catch (error) {
       console.error(error);
       toast.error('Etwas ist schief gelaufen');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit} inert={loading}>
+      <form onSubmit={handleSubmit} inert={isValidating}>
         <fieldset className='fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 mx-auto'>
           <legend className='fieldset-legend'>- {title} - bearbeiten</legend>
 
@@ -87,7 +104,7 @@ const EditDishForm = ({ dish }: { dish: Dish }) => {
                 src={
                   fileURL ||
                   `https://res.cloudinary.com/dvniua4ab/image/upload/c_thumb,g_center,h_150,w_150/f_webp/q_auto:eco/` +
-                    dish.main_dishes.image
+                    dish!.main_dishes.image
                 }
                 alt=''
                 className='object-center object-contain'
@@ -109,11 +126,11 @@ const EditDishForm = ({ dish }: { dish: Dish }) => {
           />
 
           <button className='btn'>
-            {loading ? <span className='loading loading-infinity loading-sm'></span> : 'Speichern'}
+            {isValidating ? <span className='loading loading-infinity loading-sm'></span> : 'Speichern'}
           </button>
         </fieldset>
       </form>
-      <VariantsForm dishId={dish.main_dishes.id} />
+      <VariantsForm dishId={dishId} />
     </>
   );
 };
