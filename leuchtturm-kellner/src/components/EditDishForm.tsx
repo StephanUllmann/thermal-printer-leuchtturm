@@ -143,7 +143,7 @@ const EditDishForm = ({
           </button>
         </fieldset>
       </form>
-      <button onClick={() => handleDelete(dishId)} className='btn btn-error mx-auto block fixed top-3 right-5'>
+      <button onClick={() => handleDelete(dishId!)} className='btn btn-error mx-auto block fixed top-3 right-5'>
         {title} löschen
       </button>
       <VariantsForm dishId={dishId} />
