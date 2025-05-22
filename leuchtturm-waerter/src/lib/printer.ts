@@ -127,7 +127,16 @@ export const printData = (data: string) => {
     const now = new Date();
     const time = dateFormat.format(now);
 
-    let result = encoder.initialize().text(time).newline().text(data).newline().newline().encode();
+    let result = encoder
+      .initialize()
+      .size(2)
+      .font('B')
+      .bold(true)
+      .line(time)
+      .bold(false)
+      .line(data)
+      .newline(2)
+      .encode();
     client.write(result);
     resolve('Done');
   });
@@ -144,17 +153,33 @@ export const printTable = (data: any) => {
 
     let result = encoder
       .initialize()
-      .text(time)
+      .newline(2)
+      .font('B')
+      .size(3)
+      .underline(true)
+      .line(time)
+      .underline(false)
+      .size(1)
       .newline()
+      .bold(true)
+      .size(2, 2)
       .table(
         [
-          { width: 36, marginRight: 2, align: 'left' },
-          { width: 10, align: 'right' },
+          { width: 22, marginRight: 3, align: 'left' },
+          { width: 5, align: 'right', verticalAlign: 'bottom' },
         ],
         data
+          .reduce((acc, val) => {
+            acc.push(val);
+            acc.push(['', '']);
+            return acc;
+          }, [])
+          .map(([title, count]) => [title, count])
+        // data
       )
-      .newline()
-      .newline()
+      .size(1, 1)
+      .bold(false)
+      .newline(4)
       .encode();
     client.write(result);
     resolve('Done');
