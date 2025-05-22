@@ -19,3 +19,5 @@ export default class CloudinaryStorage {
     cb(new Error('No File Removal'));
   }
 }
+
+export { cloudinary };

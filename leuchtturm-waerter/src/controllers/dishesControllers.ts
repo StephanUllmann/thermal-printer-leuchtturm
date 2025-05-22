@@ -2,6 +2,7 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { categoriesTable, dishTable, variantsTable } from '../db/schemas.js';
 import { Request, Response } from 'express';
+import { cloudinary } from '../services/cloudinary.js';
 interface Variant {
   id: number;
   title: string;
@@ -62,9 +63,21 @@ const updateDish = async (req, res) => {
   const title = req.body.title;
   const category = req.body.category;
   const image = req.file?.public_id;
-
+  const old = await db.select({ image: dishTable.image }).from(dishTable).where(eq(dishTable.id, dishId));
+  // console.log({ old });
+  if (!old) throw Error('Dish not found');
+  const key = old[0].image;
   await db.update(dishTable).set({ title, image, category }).where(eq(dishTable.id, dishId));
+  cloudinary.uploader.destroy(key);
   // res.json({ msg: 'Dish updated', result, image: req.file });
+  await getAllDishes(req, res);
+};
+
+const deleteDish = async (req, res) => {
+  const { dishId } = req.params;
+  const deleted = await db.delete(dishTable).where(eq(dishTable.id, dishId)).returning({ image: dishTable.image });
+  const key = deleted[0].image;
+  cloudinary.uploader.destroy(key);
   await getAllDishes(req, res);
 };
 
@@ -94,4 +107,13 @@ const createCategory = async (req, res) => {
   await getCategories(req, res);
 };
 
-export { getAllDishes, createDish, createVariant, deleteVariant, getCategories, createCategory, updateDish };
+export {
+  getAllDishes,
+  createDish,
+  createVariant,
+  deleteVariant,
+  getCategories,
+  createCategory,
+  updateDish,
+  deleteDish,
+};

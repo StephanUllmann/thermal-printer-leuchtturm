@@ -3,7 +3,7 @@ import DirectMessage from './DirectMessage';
 
 const Nav = () => {
   return (
-    <header className='fixed w-screen'>
+    <header className='fixed w-screen z-50'>
       <nav>
         <div className='navbar bg-base-100 shadow-sm'>
           <div className='navbar-start'>

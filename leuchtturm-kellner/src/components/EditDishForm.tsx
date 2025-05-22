@@ -3,21 +3,16 @@ import useSWR from 'swr';
 import { toast } from 'react-toastify';
 import AddCategory from './AddCategory';
 import VariantsForm from './VariantsForm';
-import { fetcher } from '../utils';
+import { fetcher, editDish, deleteDish } from '../utils';
 import type { Dish, InsertCategory } from '../types';
 
-const editDish = async (dishId: number, formData: FormData) => {
-  const res = await fetch(`http://localhost:3000/dishes/${dishId}`, {
-    method: 'PUT',
-    body: formData,
-  });
-
-  if (!res.ok) throw new Error('Error posting new dish', { cause: res });
-  const data = await res.json();
-  return data;
-};
-
-const EditDishForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
+const EditDishForm = ({
+  dishId,
+  setDishSelected,
+}: {
+  dishId: Dish['main_dishes']['id'];
+  setDishSelected: React.Dispatch<React.SetStateAction<Dish | null>>;
+}) => {
   const [fileURL, setFileURL] = useState('');
   const [file, setFile] = useState<null | File>(null);
   const { data: categories } = useSWR<InsertCategory[]>('http://localhost:3000/dishes/categories', fetcher);
@@ -51,6 +46,24 @@ const EditDishForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
       toast.success('Gespeichert');
       setFile(null);
       setFileURL('');
+    } catch (error) {
+      console.error(error);
+      toast.error('Etwas ist schief gelaufen');
+    }
+  };
+
+  const handleDelete = async (dishId: number) => {
+    try {
+      const optimisticData = dishes?.filter((d) => d.main_dishes.id !== dishId);
+
+      setDishSelected(null);
+      await mutate(deleteDish(dishId!), {
+        optimisticData,
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: true,
+      });
+      toast.success('Gelöscht');
     } catch (error) {
       console.error(error);
       toast.error('Etwas ist schief gelaufen');
@@ -130,6 +143,9 @@ const EditDishForm = ({ dishId }: { dishId: Dish['main_dishes']['id'] }) => {
           </button>
         </fieldset>
       </form>
+      <button onClick={() => handleDelete(dishId)} className='btn btn-error mx-auto block fixed top-3 right-5'>
+        {title} löschen
+      </button>
       <VariantsForm dishId={dishId} />
     </>
   );

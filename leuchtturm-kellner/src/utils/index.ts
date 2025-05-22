@@ -1,3 +1,3 @@
-import { fetcher, createDish, createCategory } from './fetcher';
+import { fetcher, createDish, createCategory, editDish, deleteDish } from './fetcher';
 
-export { fetcher, createDish, createCategory };
+export { fetcher, createDish, createCategory, editDish, deleteDish };

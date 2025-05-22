@@ -22,3 +22,23 @@ export const createCategory = async (newCategory: string) => {
   const data = await res.json();
   return data;
 };
+
+export const editDish = async (dishId: number, formData: FormData) => {
+  const res = await fetch(`http://localhost:3000/dishes/${dishId}`, {
+    method: 'PUT',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Error editing dish', { cause: res });
+  const data = await res.json();
+  return data;
+};
+export const deleteDish = async (dishId: number) => {
+  const res = await fetch(`http://localhost:3000/dishes/${dishId}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) throw new Error('Error deleting dish', { cause: res });
+  const data = await res.json();
+  return data;
+};

@@ -10,7 +10,11 @@ const AddDish = () => {
   return (
     <>
       {dishSelected ? (
-        <EditDishForm key={dishSelected.main_dishes.id} dishId={dishSelected.main_dishes.id} />
+        <EditDishForm
+          key={dishSelected.main_dishes.id}
+          dishId={dishSelected.main_dishes.id}
+          setDishSelected={setDishSelected}
+        />
       ) : (
         <AddDishForm />
       )}

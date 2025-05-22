@@ -42,7 +42,7 @@ const AddVariants = ({
             }
             alt=''
           />
-          <p className='col-end-1 row-end-1 text-slate-100 bg-slate-800/70 h-fit w-fit py-0.5 px-2 rounded m-2 self-end-safe'>
+          <p className='col-end-1 row-end-1 text-slate-100 bg-slate-800/70 h-fit w-fit py-0.5 px-2 rounded mb-2 max-w-full self-end-safe truncate text-wrap'>
             {d.main_dishes.title}
           </p>
         </button>
