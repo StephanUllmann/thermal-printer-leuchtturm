@@ -61,11 +61,11 @@ const Home = () => {
       toast.error('Das ist schief gegangen');
     }
   };
-
+  console.log(selection);
   return (
     <>
       {selection && (
-        <button onClick={handleSendToKitchen} className='fixed top-3 right-5 btn-primary btn'>
+        <button onClick={handleSendToKitchen} className='fixed top-3 right-5 btn-primary btn z-50'>
           In die Küche!
         </button>
       )}
