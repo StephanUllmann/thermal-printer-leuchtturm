@@ -87,23 +87,26 @@ const Home = () => {
       <div className='flex gap-16 relative '>
         <nav className=''>
           <ul className='sticky top-20 space-y-1'>
-            <li
-              onClick={() => setSelectedCat(null)}
-              className={`py-3 px-2 bg-neutral/20 mb-3 hover:bg-neutral/30 rounded-xl shadow cursor-pointer ${
-                !selectedCat ? 'bg-neutral/40' : ''
-              }`}
-            >
-              Alle
+            <li>
+              <button
+                className={` w-full text-start py-3 px-2 bg-accent/20 mb-3 hover:bg-accent/30 rounded-xl shadow cursor-pointer ${
+                  !selectedCat ? 'bg-accent/40' : ''
+                }`}
+                onClick={() => setSelectedCat(null)}
+              >
+                Alle
+              </button>
             </li>
             {ordered?.map(([category]) => (
-              <li
-                key={'list-menu-' + category}
-                onClick={() => setSelectedCat(category)}
-                className={`py-3 px-2 bg-neutral/10 hover:bg-neutral/20 rounded-xl shadow cursor-pointer ${
-                  selectedCat === category ? 'ring ring-neutral/50 bg-neutral/40' : ''
-                }`}
-              >
-                {category}
+              <li key={'list-menu-' + category}>
+                <button
+                  onClick={() => setSelectedCat(category)}
+                  className={`w-full text-start py-3 px-2 bg-accent/10 hover:bg-accent/20 rounded-xl shadow cursor-pointer ${
+                    selectedCat === category ? 'ring ring-accent/50 bg-accent/40' : ''
+                  }`}
+                >
+                  {category}
+                </button>
               </li>
             ))}
           </ul>

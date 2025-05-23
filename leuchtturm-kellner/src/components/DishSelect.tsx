@@ -94,11 +94,7 @@ const DishSelect = ({
         )}
       </div>
       {hasVariants && (
-        <ul
-          className={`mb-5 overflow-clip transition-[height] transition-discrete shadow-lg ${
-            showVariants ? 'h-auto' : 'h-0'
-          }`}
-        >
+        <ul className={`mb-5 overflow-clip transition-[height] transition-discrete ${showVariants ? 'h-auto' : 'h-0'}`}>
           <li className='list-row justify-between flex'>
             <div className='content-center'>
               <div className='ml-5 text-xs capitalize font-semibold opacity-60'>Standard</div>
