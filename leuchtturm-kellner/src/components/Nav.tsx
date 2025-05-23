@@ -1,5 +1,5 @@
-import { Link, NavLink } from 'react-router-dom';
-import DirectMessage from './DirectMessage';
+import { Link } from 'react-router-dom';
+// import DirectMessage from './DirectMessage';
 
 const Nav = () => {
   return (
@@ -7,7 +7,7 @@ const Nav = () => {
       <nav>
         <div className='navbar bg-base-100 shadow-sm'>
           <div className='navbar-start'>
-            <div className='dropdown'>
+            {/* <div className='dropdown'>
               <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
@@ -36,7 +36,7 @@ const Nav = () => {
                 </li>
               </ul>
             </div>
-            <DirectMessage />
+            <DirectMessage /> */}
           </div>
           <div className='navbar-center'>
             <Link to={'/'} className='btn btn-ghost text-xl capitalize'>

@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 
 const Home = () => {
   const { data: mainDishes } = useSWR<Dish[]>('http://localhost:3000/dishes', fetcher);
+  const [selectedCat, setSelectedCat] = useState<string | null>(null);
   const [selection, setSelection] = useState<null | Record<string, number>>(null);
 
   const changeSelection = useCallback(
@@ -29,13 +30,22 @@ const Home = () => {
   );
 
   // console.log(selection);
+  // console.dir(mainDishes);
 
   const ordered =
     mainDishes &&
     Object.entries(Object.groupBy(mainDishes, ({ categories }) => categories.name)).sort((a, b) =>
       a[0].localeCompare(b[0])
     );
-  // console.dir(mainDishes);
+
+  const dishesToDisplay =
+    ordered && selectedCat
+      ? ([
+          Object.entries(Object.groupBy(mainDishes, ({ categories }) => categories.name)).find(
+            ([cat]) => cat === selectedCat
+          ),
+        ] as [string, Dish[]][])
+      : ordered;
 
   const handleSendToKitchen = async () => {
     if (!selection) return;
@@ -61,24 +71,54 @@ const Home = () => {
       toast.error('Das ist schief gegangen');
     }
   };
-  console.log(selection);
+  // console.log({ dishesToDisplay });
   return (
     <>
       {selection && (
-        <button onClick={handleSendToKitchen} className='fixed top-3 right-5 btn-primary btn z-50'>
-          In die Küche!
-        </button>
+        <>
+          <button onClick={() => setSelection(null)} className='fixed top-3 left-5 z-50 btn-warning btn '>
+            Reset
+          </button>
+          <button onClick={handleSendToKitchen} className='fixed top-3 right-5 z-50 btn-primary btn'>
+            In die Küche!
+          </button>
+        </>
       )}
-      <div className=''>
-        {ordered?.map(([category, dishes]) => (
-          <Categories
-            key={category}
-            category={category}
-            dishes={dishes as Dish[]}
-            selection={selection}
-            changeSelection={changeSelection}
-          />
-        ))}
+      <div className='flex gap-16 relative '>
+        <nav className=''>
+          <ul className='sticky top-20 space-y-1'>
+            <li
+              onClick={() => setSelectedCat(null)}
+              className={`py-3 px-2 bg-neutral/20 mb-3 hover:bg-neutral/30 rounded-xl shadow cursor-pointer ${
+                !selectedCat ? 'bg-neutral/40' : ''
+              }`}
+            >
+              Alle
+            </li>
+            {ordered?.map(([category]) => (
+              <li
+                key={'list-menu-' + category}
+                onClick={() => setSelectedCat(category)}
+                className={`py-3 px-2 bg-neutral/10 hover:bg-neutral/20 rounded-xl shadow cursor-pointer ${
+                  selectedCat === category ? 'ring ring-neutral/50 bg-neutral/40' : ''
+                }`}
+              >
+                {category}
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className=' '>
+          {dishesToDisplay?.map(([category, dishes]) => (
+            <Categories
+              key={category}
+              category={category}
+              dishes={dishes as Dish[]}
+              selection={selection}
+              changeSelection={changeSelection}
+            />
+          ))}
+        </div>
       </div>
     </>
   );

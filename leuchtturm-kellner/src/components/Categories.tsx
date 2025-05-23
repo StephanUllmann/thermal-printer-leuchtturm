@@ -13,7 +13,7 @@ const Categories = ({
   changeSelection: (name: string, operation: 'inc' | 'dec') => void;
 }) => {
   return (
-    <section className='group'>
+    <section className='group w-[70vw]'>
       <h2>{category}</h2>
       <ul className='list bg-base-100 rounded-box shadow-md'>
         {dishes?.map((dish) => (

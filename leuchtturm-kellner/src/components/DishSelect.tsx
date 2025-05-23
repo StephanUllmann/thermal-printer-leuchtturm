@@ -40,8 +40,8 @@ const DishSelect = ({
   }, []);
 
   return (
-    <li ref={liRef} onClick={() => hasVariants && setShowVariants(true)}>
-      <div className='list-row'>
+    <li ref={liRef} className=''>
+      <div className='list-row shadow' onClick={() => hasVariants && setShowVariants((p) => !p)}>
         <div>
           <img
             className='size-10 rounded-box'
@@ -53,26 +53,51 @@ const DishSelect = ({
           />
         </div>
         <div className='content-center'>
-          <div className='text-sm capitalize font-semibold opacity-60'>{dish.main_dishes.title}</div>
+          <div className='text-lg capitalize font-semibold opacity-80'>{dish.main_dishes.title}</div>
         </div>
-        <button
-          onClick={() => (hasVariants ? setShowVariants(true) : handleSelect(dish.main_dishes.title, 'dec'))}
-          className='btn btn-square '
-        >
-          &minus;
-        </button>
+        {hasVariants ? (
+          <>
+            {totalStandard > 0 && <span className='content-center'>{totalStandard}</span>}
+            <button className='mr-10'>
+              <svg
+                width='16'
+                height='16'
+                fill='currentColor'
+                className={`transition-transform rotate-0 ${showVariants ? 'rotate-180 outline-0' : ''}}`}
+                viewBox='0 0 16 16'
+              >
+                <path
+                  fillRule='evenodd'
+                  d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'
+                />
+              </svg>
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => (hasVariants ? setShowVariants(true) : handleSelect(dish.main_dishes.title, 'dec'))}
+              className='btn btn-square '
+            >
+              &minus;
+            </button>
 
-        <span className='content-center'>{totalStandard}</span>
-        <button
-          onClick={() => (hasVariants ? setShowVariants(true) : handleSelect(dish.main_dishes.title, 'inc'))}
-          className='btn btn-square '
-        >
-          &#x2B;
-        </button>
+            <span className='content-center'>{totalStandard}</span>
+
+            <button
+              onClick={() => (hasVariants ? setShowVariants(true) : handleSelect(dish.main_dishes.title, 'inc'))}
+              className='btn btn-square '
+            >
+              &#x2B;
+            </button>
+          </>
+        )}
       </div>
       {hasVariants && (
         <ul
-          className={`mb-5 overflow-clip transition-[height] transition-discrete k ${showVariants ? 'h-auto' : 'h-0'}`}
+          className={`mb-5 overflow-clip transition-[height] transition-discrete shadow-lg ${
+            showVariants ? 'h-auto' : 'h-0'
+          }`}
         >
           <li className='list-row justify-between flex'>
             <div className='content-center'>

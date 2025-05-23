@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Nav from '../components/Nav';
+import Dock from '../components/Dock';
 
 const MainLayout = () => {
   return (
@@ -9,7 +10,7 @@ const MainLayout = () => {
       <main className='mt-20 mx-auto'>
         <Outlet />
       </main>
-      <footer>&copy; '25</footer>
+      <Dock />
       <ToastContainer aria-label={'Toaster'} />
     </div>
   );
