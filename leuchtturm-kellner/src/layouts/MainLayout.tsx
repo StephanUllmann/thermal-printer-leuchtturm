@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import Nav from '../components/Nav';
 import Dock from '../components/Dock';
 
-const themeMap = {
+const themeMap: Record<string, string> = {
   light: 'garden',
   dark: 'night',
 };
