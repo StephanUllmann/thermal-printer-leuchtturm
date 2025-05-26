@@ -15,4 +15,8 @@ export const categoriesTable = pgTable('categories', {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 510 }).notNull().unique(),
 });
+export const printersTable = pgTable('printers', {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    ip: varchar({ length: 510 }).notNull().unique(),
+});
 //# sourceMappingURL=schemas.js.map

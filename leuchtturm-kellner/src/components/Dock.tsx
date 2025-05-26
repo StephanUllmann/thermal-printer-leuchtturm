@@ -1,11 +1,79 @@
+import { useEffect, useState, type FormEvent } from 'react';
 import { NavLink } from 'react-router-dom';
 import LighthouseIcon from './icons/LighthouseIcon';
 import EditIcon from './icons/EditIcon';
 import SettingsIcon from './icons/SettingsIcon';
 import LightModeIcon from './icons/LightModeIcon';
 import DarkModeIcon from './icons/DarkModeIcon';
+import { toast } from 'react-toastify';
+
+const ipRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
 
 const Dock = ({ setTheme }: { setTheme: React.Dispatch<React.SetStateAction<string>> }) => {
+  const [printer, setPrinter] = useState({
+    input: '',
+    oldIP: '',
+    isConnected: false,
+  });
+
+  useEffect(() => {
+    const fetchPrinterIP = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/print/ip');
+        const data = await res.json();
+        setPrinter({
+          input: data.ip,
+          oldIP: data.ip,
+          isConnected: data.isConnected,
+        });
+        if (!data.isConnected) {
+          toast.error('Drucker nicht verbunden');
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPrinterIP();
+  }, []);
+
+  const handlePrinterIPChange = async (e: FormEvent) => {
+    e.preventDefault();
+    const isIp = ipRegex.test(printer.input);
+    if (!isIp) {
+      toast.error('Tippfehler in der IP');
+    }
+    try {
+      const res = await fetch('http://localhost:3000/print/ip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ip: printer.input }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error('Update failed');
+      setPrinter({
+        input: data.ip,
+        oldIP: data.ip,
+        isConnected: data.isConnected,
+      });
+      if (!data.isConnected) {
+        toast.error('Drucker nicht verbunden');
+      } else {
+        toast.success('Drucker verbunden');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Update ging schief');
+      // setPrinterIP(oldPrinterIP);
+      setPrinter((p) => ({
+        input: p.oldIP,
+        oldIP: p.oldIP,
+        isConnected: p.isConnected,
+      }));
+    }
+  };
   return (
     <footer>
       <div className='dock dock-lg'>
@@ -43,7 +111,29 @@ const Dock = ({ setTheme }: { setTheme: React.Dispatch<React.SetStateAction<stri
               </div>
             </li>
             <li>
-              <a>Item 2</a>
+              <div className='dropdown dropdown-left dropdown-end '>
+                <div className='indicator'>
+                  <span
+                    className={`indicator-item status ${printer.isConnected ? 'status-success' : 'status-error'}`}
+                  ></span>
+                  <button className=''>Drucker IP</button>
+                </div>
+
+                <ul tabIndex={0} className='dropdown-content menu bg-base-100 rounded-box z-1 w-72 p-2 shadow-sm '>
+                  <li>
+                    <form className='join' onSubmit={handlePrinterIPChange}>
+                      <input
+                        className='input'
+                        type='text'
+                        name='ip'
+                        value={printer.input}
+                        onChange={(e) => setPrinter((p) => ({ ...p, input: e.target.value }))}
+                      />
+                      <button className='btn btn-warning cursor-pointer'>Ändern</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
         </div>

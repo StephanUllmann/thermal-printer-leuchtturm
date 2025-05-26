@@ -19,6 +19,11 @@ export const categoriesTable = pgTable('categories', {
   name: varchar({ length: 510 }).notNull().unique(),
 });
 
+export const printersTable = pgTable('printers', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  ip: varchar({ length: 510 }).notNull().unique(),
+});
+
 export type InsertDish = typeof dishTable.$inferInsert;
 export type SelectDish = typeof dishTable.$inferSelect;
 

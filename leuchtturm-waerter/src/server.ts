@@ -4,7 +4,7 @@ import dishesRouter from './routes/dishesRouter.js';
 import printRouter from './routes/printRouter.js';
 import { initializePrinterConnection } from './lib/printer.js';
 
-initializePrinterConnection();
+await initializePrinterConnection();
 
 const app = express();
 const port = process.env.PORT || 3000;
