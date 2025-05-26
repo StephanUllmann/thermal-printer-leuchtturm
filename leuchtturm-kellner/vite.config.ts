@@ -19,7 +19,14 @@ export default defineConfig({
         name: 'Leuchtturm',
         short_name: 'Leuchtturm',
         description: 'Bonprinter für die Küche',
-        theme_color: '#ffffff',
+        theme_color: '#0F1729',
+      },
+
+      devOptions: {
+        enabled: true,
+        navigateFallback: 'index.html',
+        suppressWarnings: true,
+        type: 'module',
       },
     }),
   ],

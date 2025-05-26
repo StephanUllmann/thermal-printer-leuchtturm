@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Nav from '../components/Nav';
@@ -11,6 +11,30 @@ const themeMap: Record<string, string> = {
 
 const MainLayout = () => {
   const [theme, setTheme] = useState<string>('garden');
+  const [installEvent, setInstallEvent] = useState<any>(null);
+
+  useEffect(() => {
+    let installed = false;
+
+    window.addEventListener(
+      'appinstalled',
+      () => {
+        installed = true;
+        setInstallEvent(null);
+      },
+      { once: true }
+    );
+
+    window.addEventListener(
+      'beforeinstallprompt',
+      async (e) => {
+        if (installed) return;
+        setInstallEvent(e);
+      },
+      { once: true }
+    );
+  }, []);
+
   return (
     <div data-theme={themeMap[theme]} className='grid grid-rows-[1fr_2rem] min-h-screen'>
       <Nav />
@@ -19,6 +43,16 @@ const MainLayout = () => {
       </main>
       <Dock setTheme={setTheme} />
       <ToastContainer aria-label={'Toaster'} />
+      {installEvent && (
+        <button
+          onClick={async () => {
+            await installEvent.prompt();
+          }}
+          className='btn btn-warning absolute top-3 right-5 z-50'
+        >
+          Install
+        </button>
+      )}
     </div>
   );
 };
