@@ -87,15 +87,15 @@ const createClient = async () => {
         if (reconnectTimeout) {
             clearTimeout(reconnectTimeout);
         }
+        reconnectTimeout = setTimeout(connectPrinterInternal, RECONNECT_DELAY_MS);
         // Schedule reconnection only if this 'close' event is still attached (i.e., not manually disconnected)
         // And ensure client object is the one this listener was attached to.
-        if (client === newClient && !client.destroyed && client.listenerCount('close') > 0) {
-            // console.log(`[🧾 THERMAL] Attempting reconnect in ${RECONNECT_DELAY_MS / 1000} seconds...`);
-            reconnectTimeout = setTimeout(connectPrinterInternal, RECONNECT_DELAY_MS);
-        }
-        else if (client && client.destroyed) {
-            // console.log('[🧾 THERMAL] Client was destroyed, no automatic reconnect scheduled by this instance.');
-        }
+        // if (client === newClient && !client.destroyed && client.listenerCount('close') > 0) {
+        //   // console.log(`[🧾 THERMAL] Attempting reconnect in ${RECONNECT_DELAY_MS / 1000} seconds...`);
+        // } else if (client && client.destroyed) {
+        //   console.log('[🧾 THERMAL] Client was destroyed, no automatic reconnect scheduled by this instance.');
+        //   reconnectTimeout = setTimeout(connectPrinterInternal, RECONNECT_DELAY_MS);
+        // }
     });
     newClient.on('error', (err) => {
         console.error('[🧾 THERMAL] Socket Error:', err.message);
