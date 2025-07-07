@@ -55,7 +55,7 @@ const DishSelect = ({
 					/>
 				</div>
 				<div className="content-center">
-					<div className="text-lg capitalize font-semibold opacity-80">
+					<div className="text-lg font-semibold opacity-80">
 						{dish.main_dishes.title}
 					</div>
 				</div>
@@ -116,7 +116,7 @@ const DishSelect = ({
 				>
 					<li className="list-row justify-between flex">
 						<div className="content-center">
-							<div className="ml-5 text-xs capitalize font-semibold opacity-60">
+							<div className="ml-5 text-xs font-semibold opacity-60">
 								Standard
 							</div>
 						</div>
@@ -145,7 +145,7 @@ const DishSelect = ({
 						return (
 							<li key={key} className="list-row justify-between flex">
 								<div className="content-center">
-									<div className="ml-5 text-xs capitalize font-semibold opacity-60">
+									<div className="ml-5 text-xs font-semibold opacity-60">
 										{v.title}
 									</div>
 								</div>
