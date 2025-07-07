@@ -1,13 +1,13 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 // import DirectMessage from './DirectMessage';
 
 const Nav = () => {
-  return (
-    <header className='fixed w-screen z-50'>
-      <nav>
-        <div className='navbar bg-base-100 shadow-sm'>
-          <div className='navbar-start'>
-            {/* <div className='dropdown'>
+	return (
+		<header className="fixed w-screen z-50">
+			<nav>
+				<div className="navbar bg-base-100 shadow-sm">
+					<div className="navbar-start">
+						{/* <div className='dropdown'>
               <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
@@ -37,17 +37,17 @@ const Nav = () => {
               </ul>
             </div>
             <DirectMessage /> */}
-          </div>
-          <div className='navbar-center'>
-            <Link to={'/'} className='btn btn-ghost text-xl capitalize'>
-              Leuchtturm
-            </Link>
-          </div>
-          <div className='navbar-end'></div>
-        </div>
-      </nav>
-    </header>
-  );
+					</div>
+					<div className="navbar-center">
+						<Link to={"/"} className="btn btn-ghost text-xl capitalize">
+							Leuchtturm
+						</Link>
+					</div>
+					<div className="navbar-end" />
+				</div>
+			</nav>
+		</header>
+	);
 };
 
 export default Nav;
