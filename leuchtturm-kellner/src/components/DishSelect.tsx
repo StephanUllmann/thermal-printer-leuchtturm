@@ -114,7 +114,7 @@ const DishSelect = ({
 				<ul
 					className={`mb-5 overflow-clip transition-[height] transition-discrete ${showVariants ? "h-auto" : "h-0"}`}
 				>
-					<li className="list-row justify-between flex">
+					{/* <li className="list-row justify-between flex">
 						<div className="content-center">
 							<div className="ml-5 text-xs font-semibold opacity-60">
 								Standard
@@ -139,7 +139,7 @@ const DishSelect = ({
 								&#x2B;
 							</button>
 						</div>
-					</li>
+					</li> */}
 					{dish.variants?.map((v) => {
 						const key = `${dish.main_dishes.title} -- ${v.title}`;
 						return (
