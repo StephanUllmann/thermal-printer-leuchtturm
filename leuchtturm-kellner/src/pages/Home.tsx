@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Categories from "../components/Categories";
 import { fetcher } from "../utils";
 import useSWR from "swr";
@@ -14,6 +14,8 @@ const Home = () => {
 		null,
 	);
 	const [tableNum, setTableNum] = useState("");
+	const dialogRef = useRef<HTMLDialogElement>(null);
+	const [toPrint, setToPrint] = useState<string[][] | null>(null);
 
 	const changeSelection = useCallback(
 		(name: string, operation: "inc" | "dec") => {
@@ -53,13 +55,21 @@ const Home = () => {
 				] as [string, Dish[]][])
 			: ordered;
 
-	const handleSendToKitchen = async () => {
+	const handleConfirm = () => {
 		if (!selection) return;
-		const toPrint = Object.entries(selection)
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([title, count]) => [title, count.toString()]);
+		dialogRef.current?.showModal();
+		setToPrint(() => {
+			const list = Object.entries(selection)
+				.sort((a, b) => a[0].localeCompare(b[0]))
+				.map(([title, count]) => [title, count.toString()]);
 
-		if (tableNum) toPrint.unshift(["Tischnummer", tableNum]);
+			if (tableNum) list.unshift(["Tischnummer", tableNum]);
+			return list;
+		});
+	};
+
+	const handleSendToKitchen = async () => {
+		if (!selection || !toPrint) return;
 
 		try {
 			const res = await fetch("http://localhost:3000/print/order", {
@@ -79,9 +89,17 @@ const Home = () => {
 			toast.error("Das ist schief gegangen");
 		}
 	};
-	// console.log({ dishesToDisplay });
+
 	return (
 		<>
+			<input
+				type="number"
+				className="input fixed top-3 left-28 !z-50"
+				placeholder="Tischnummer"
+				value={tableNum}
+				onChange={(e) => setTableNum(e.target.value)}
+				min={0}
+			/>
 			{selection && (
 				<>
 					<button
@@ -91,17 +109,9 @@ const Home = () => {
 					>
 						Reset
 					</button>
-					<input
-						type="number"
-						className="input fixed top-3 left-28 !z-50"
-						placeholder="Tischnummer"
-						value={tableNum}
-						onChange={(e) => setTableNum(e.target.value)}
-						min={0}
-					/>
 					<button
 						type="button"
-						onClick={handleSendToKitchen}
+						onClick={handleConfirm}
 						className="fixed top-3 right-5 z-50 btn-primary btn"
 					>
 						In die Küche!
@@ -151,6 +161,41 @@ const Home = () => {
 					))}
 				</div>
 			</div>
+			<dialog ref={dialogRef} className="modal">
+				<div className="modal-box">
+					<h3 className="font-bold text-lg">Zusammenfassung</h3>
+					<ul className="max-h-[10lh] leading-8 overflow-y-auto">
+						{toPrint?.map(([val, qty], ind) => {
+							if (ind === 0 && tableNum) {
+								return (
+									<li key={val}>
+										<span className="font-bold">Tisch {qty}</span>
+									</li>
+								);
+							}
+							return (
+								<li key={val} data-qty={qty} className="qty-marker ml-2">
+									{qty}x: <span className="truncate">{val}</span>
+								</li>
+							);
+						})}
+					</ul>
+					<div className="modal-action flex justify-between">
+						<form method="dialog">
+							<button className="btn btn-warning" type="submit">
+								Abbrechen
+							</button>
+						</form>
+						<button
+							className="btn btn-success"
+							type="button"
+							onClick={handleSendToKitchen}
+						>
+							In die Küche
+						</button>
+					</div>
+				</div>
+			</dialog>
 		</>
 	);
 };

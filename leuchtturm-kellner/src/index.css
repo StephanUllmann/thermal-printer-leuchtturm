@@ -1,9 +1,19 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @plugin "daisyui" {
-  themes: garden --default, night --prefersdark, cupcake;
+	themes:
+		garden --default,
+		night --prefersdark,
+		cupcake;
 }
 
 :root {
-  scrollbar-gutter: stable;
-  interpolate-size: allow-keywords;
+	scrollbar-gutter: stable;
+	interpolate-size: allow-keywords;
 }
+
+/* .qty-marker {
+	list-style: circle;
+	&::marker {
+		content: attr(data-qty);
+	}
+} */
